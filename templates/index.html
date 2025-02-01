@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Spinner animation */
+        @keyframes spinner {
+            to {transform: rotate(360deg);}
+        }
+        .spinner:before {
+            content: '';
+            box-sizing: border-box;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50px;
+            height: 50px;
+            margin-top: -25px;
+            margin-left: -25px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: #3498db;
+            animation: spinner .6s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 font-sans leading-normal tracking-normal text-white">
+    <div class="container mx-auto mt-12 p-6 bg-gray-800 rounded-lg shadow-lg">
+        <h1 class="text-center text-4xl font-bold mb-10">Sentiment Analysis Tool</h1>
+        <form method="POST" id="analysisForm" class="bg-gray-700 rounded px-8 pt-6 pb-8 mb-4">
+            <div class="mb-6">
+                <textarea name="text" placeholder="Enter text or tweet keywords here..." rows="4" class="w-full p-4 border border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900"></textarea>
+            </div>
+            <div class="flex space-x-4">
+                <button type="submit" name="action" value="Encrypt" class="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                    Encrypt
+                </button>
+                <button type="submit" name="action" value="Analyze Sentiment" class="flex-1 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                    Analyze Sentiment
+                </button>
+            </div>
+        </form>
+
+        <div id="loading" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 z-50 flex justify-center items-center">
+            <div class="spinner"></div>
+        </div>
+
+        {% if encrypted_text %}
+            <div class="mt-6 p-4 bg-gray-700 rounded-lg">
+                <h2 class="text-xl font-semibold">Encrypted Text:</h2>
+                <p>{{ encrypted_text }}</p>
+            </div>
+        {% endif %}
+
+        {% if analysis_results %}
+            <div class="mt-6 p-4 bg-gray-700 rounded-lg">
+                <h2 class="text-xl font-semibold">Sentiment Analysis Results:</h2>
+                <ul>
+                    {% for model, results in analysis_results.items() %}
+                        <li class="mt-4"><strong>{{ model }}</strong>:
+                            <ul>
+                                {% for result in results %}
+                                    <li>{{ result.emotion }}: {{ result.score }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold">Graph:</h3>
+                    <img src="{{ url_for('static', filename='sentiment_graph.png') }}" alt="Sentiment Graph" class="mx-auto">
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.getElementById('analysisForm').addEventListener('submit', function () {
+            document.getElementById('loading').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
